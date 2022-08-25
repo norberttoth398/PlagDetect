@@ -59,22 +59,13 @@ def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000,
 
         model.show_result(img_, result, out_file=path + "instance_res/" +name + ".jpg")
 
-        label_img = np.zeros((img_side,img_side))
-
-        for i in range(len(result[1][0])):
-                pred_mask = result[1][0][i]
-                label_img_mask = label_img > 0
-                #label_img_mask = label_img_mask.astype("int")
-
-                new_lblImg = label_img_mask.astype("int") + pred_mask.astype("int")*2
-                label_img[new_lblImg == 2] = i+1
+        label_img = tiling.create_label_image(new_result)
         
         if os.path.exists(path + "labels") == True:
             pass
         else:
             os.makedirs(path + "labels")
-        plt.imsave(path + "labels/"+name + ".jpg", label_img)
-        np.save(path + "labels/" + name, label_img)
+        np.savez(path + "labels/full_" + name, bb = new_result[0], mask = new_result[1])
 
     grid = (n,m)
     orig_shape = (image.shape[0], image.shape[1])
@@ -96,3 +87,7 @@ def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000,
     ax.imshow(img)
     ax.imshow(pan, alpha = pan_mask*0.5)
     fig.savefig(path + "labels/labelled_img", dpi = 500)
+
+
+def __tile_only__():
+    return None

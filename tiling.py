@@ -9,14 +9,33 @@ import os
 from PIL import Image
 Image.MAX_IMAGE_PIXELS = 100000000000
 
-def load_imgs(path, grid = (6,5)):
+def create_label_image(result, score_thresh = 0):
+    #create label image from result list (pre or post NMS)
+    label_img = np.zeros((img_side,img_side))
+
+    for i in range(len(result[1][0])):
+        if result[0][0][i,4] < score_thresh:
+            pass
+        else:
+            pred_mask = result[1][0][i]
+            label_img_mask = label_img > 0
+            #label_img_mask = label_img_mask.astype("int")
+
+            new_lblImg = label_img_mask.astype("int") + pred_mask.astype("int")*2
+            label_img[new_lblImg == 2] = i+1
+
+    return label_img
+
+def load_imgs(path, grid = (6,5), score_thresh = 0):
     #define relations between each tile for loading and post-processing
 
     n_tiles = grid[0]*grid[1]
     tile_list = []
 
     for n in range(n_tiles):
-        tile_list.append(np.load(path + "/image_" + str(int(n/grid[1])) + "_" + str(int(n%grid[1])) + ".jpg.npy"))
+        data = np.load(path + "/full_image_" + str(int(n/grid[1])) + "_" + str(int(n%grid[1])) + ".jpg.npz")
+        res = [data["bb"], data["mask"]]
+        tile_list.append(create_label_image(res, score_thresh))
 
     return tile_list
 
@@ -102,7 +121,7 @@ def top_overlap_row(i1, i2, corner_y, corner_x, over_n = 100, img_side = 2000, r
 
     return i1, i2
 
-def tile_run(path,grid, orig_shape, img_side, over_n):
+def tile_run(path,grid, orig_shape, img_side, over_n, score_thresh = 0):
     """Start the stitching process for the overall image from individual tiles post-inference.
 
     Args:
@@ -117,7 +136,7 @@ def tile_run(path,grid, orig_shape, img_side, over_n):
     """
     tiled_img = np.zeros(orig_shape)
     row_len = orig_shape[1]
-    tiled = load_imgs(path, grid)
+    tiled = load_imgs(path, grid, score_thresh)
     for j in range(grid[0]):
         
         tiled_row = np.zeros((img_side, orig_shape[1]))
