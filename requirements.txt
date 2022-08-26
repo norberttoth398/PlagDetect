@@ -60,7 +60,7 @@ six==1.16.0
 tabulate==0.8.9
 terminaltables==3.1.10
 tifffile==2021.11.2
-torch==1.7.0
+torch==1.7.1
 torchaudio==0.7.0
 torchvision==0.8.0
 tornado==6.1
