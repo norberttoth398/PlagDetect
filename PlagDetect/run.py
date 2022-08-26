@@ -10,10 +10,10 @@ from PIL import Image
 Image.MAX_IMAGE_PIXELS = 100000000000
 
 #own functions
-from slicing import img_slice
-from tiling import tile_run
-from nms import mask_nms, matrix_nms
-from detector import detector
+from .slicing import img_slice
+from .tiling import tile_run
+from .nms import mask_nms, matrix_nms
+from .detector import detector
 
 def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000, img_side = 2000, over_n = 100, nms_crit = 0.5):
     """Run entire script with.
