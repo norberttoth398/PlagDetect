@@ -7,7 +7,9 @@ Repository for Deep Learning based petrography of igneous Plagioclase crystals b
 In order to install this private package you must be able to access it (which you can if you're reading this) and run have/create a python 3.7 environment for relevant package requirements (PyTorch can be a pain like that). 
 
 #### Step 1
-Activate environment: eg "conda activate PlagDetectEnv"
+Activate environment: 
+	
+	eg conda activate PlagDetectEnv
 
 #### Step 2
 Install required libraries:
@@ -21,5 +23,7 @@ Install required libraries:
 	mim install mmdet
 
 #### Install PlagDetect
-Install using the following command: pip install git+ssh://git@github.com/norberttoth398/PlagDetect#egg=PlagDetect
+Install using the following command: 
+
+	pip install git+ssh://git@github.com/norberttoth398/PlagDetect#egg=PlagDetect
 
