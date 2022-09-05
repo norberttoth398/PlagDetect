@@ -89,5 +89,17 @@ def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000,
     fig.savefig(path + "labels/labelled_img", dpi = 500)
 
 
-def __tile_only__():
+def __tile_only__(img_name, img_path,tile_path, out_path, img_side, overlap, thresh = 0):
+    img = plt.imread(img_path + img_name + ".jpg")
+    orig_shape = img.shape
+    n, m = img_slice(img, img_path, img_size=img_side, overlap=overlap, slicing = False)
+    grid = (n,m)
+
+    tiled_img = tile_run(tile_path, grid, orig_shape, img_side, overlap,score_thresh = thresh)
+
+    np.save(img_name + "_res.npy", tiled_img)
+    fig, ax = plt.subplots(1,1,figsize = (12,12))
+    ax.imshow(img)
+    ax.imshow(tiled_img, alpha = pan_mask*0.5)
+    fig.savefig(out_path + name +  "labelled_img_" + str(thresh), dpi = 500)
     return None
