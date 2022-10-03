@@ -102,6 +102,7 @@ def __tile_only__(img_name, img_path,tile_path, out_path, img_side, overlap, thr
     np.savez(img_name + "_res.npy", img = tiled_img, scores = score_dict)
     fig, ax = plt.subplots(1,1,figsize = (12,12))
     ax.imshow(img)
-    ax.imshow(tiled_img, alpha = pan_mask*0.5)
+    mask = tiled_img > 0
+    ax.imshow(tiled_img, alpha = mask*0.5)
     fig.savefig(out_path + name +  "labelled_img_" + str(thresh), dpi = 500)
     return None
