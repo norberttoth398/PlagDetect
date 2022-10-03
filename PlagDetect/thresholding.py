@@ -51,7 +51,8 @@ def build_img(orig_img, pred, thresh = 0):
     pred_labels = threshold_labs(pred, thresh)
     fig, ax = plt.subplots((1,1), figsize = (12,12))
     ax.imshow(original_img)
-    ax.imshow(pred_labels, alpha = 0.5)
+    mask = pred_labels > 0
+    ax.imshow(pred_labels, alpha = mask*0.5)
 
     fig.savefig(orig_img + "_predicted_thresh" + str(thresh))
     return None
