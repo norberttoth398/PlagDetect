@@ -14,6 +14,7 @@ from .slicing import img_slice
 from .tiling import tile_run
 from .nms import mask_nms, matrix_nms
 from .detector import detector
+from .thresholding import threshold_labs, build_img
 
 def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000, img_side = 2000, over_n = 100, nms_crit = 0.5):
     """Run entire script with.
@@ -74,9 +75,10 @@ def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000,
     tile_run_path = path + "labels"
 
 
-    tiled_img = tile_run(tile_run_path, grid, orig_shape, img_side, over_n)
+    tiled_img, score_dict = tile_run(tile_run_path, grid, orig_shape, img_side, over_n)
 
     np.save(path + "labels/res.npy", tiled_img)
+    np.savez(path + "labels/full_res.npy", img = tiled_img, scores = score_dict)
 
     #combine real img and panoptic res:
     img  = plt.imread(path + img)
@@ -95,9 +97,9 @@ def __tile_only__(img_name, img_path,tile_path, out_path, img_side, overlap, thr
     n, m = img_slice(img, img_path, img_size=img_side, overlap=overlap, slicing = False)
     grid = (n,m)
 
-    tiled_img = tile_run(tile_path, grid, orig_shape, img_side, overlap,score_thresh = thresh)
+    tiled_img, score_dict = tile_run(tile_path, grid, orig_shape, img_side, overlap,score_thresh = thresh)
 
-    np.save(img_name + "_res.npy", tiled_img)
+    np.savez(img_name + "_res.npy", img = tiled_img, scores = score_dict)
     fig, ax = plt.subplots(1,1,figsize = (12,12))
     ax.imshow(img)
     ax.imshow(tiled_img, alpha = pan_mask*0.5)

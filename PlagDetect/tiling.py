@@ -12,7 +12,7 @@ Image.MAX_IMAGE_PIXELS = 100000000000
 def create_label_image(result,img_side, score_thresh = 0):
     #create label image from result list (pre or post NMS)
     label_img = np.zeros((img_side,img_side))
-
+    used_scores = []
     for i in range(len(result[1][0])):
         if result[0][0][i,4] < score_thresh:
             pass
@@ -23,21 +23,26 @@ def create_label_image(result,img_side, score_thresh = 0):
 
             new_lblImg = label_img_mask.astype("int") + pred_mask.astype("int")*2
             label_img[new_lblImg == 2] = i+1
+            #scores[i] is for label_number = i+1 annoyingly as 0 is unclassified
+            used_scores.append(result[0][0][i,4])
 
-    return label_img
+    return label_img, used_scores
 
 def load_imgs(path, img_side ,grid = (6,5), score_thresh = 0):
     #define relations between each tile for loading and post-processing
 
     n_tiles = grid[0]*grid[1]
     tile_list = []
+    score_list = []
 
     for n in range(n_tiles):
         data = np.load(path + "/full_image_" + str(int(n/grid[1])) + "_" + str(int(n%grid[1])) + ".jpg.npz")
         res = [data["bb"], data["mask"]]
-        tile_list.append(create_label_image(res, img_side, score_thresh))
+        lImage, scores = create_label_image(res, img_side, score_thresh)
+        tile_list.append(lImage)
+        score_list.append(scores)
 
-    return tile_list
+    return tile_list, score_list
 
 
 def replace_vals(img1, img2, overlapped, corner_x, corner_y):
@@ -121,6 +126,75 @@ def top_overlap_row(i1, i2, corner_y, corner_x, over_n = 100, img_side = 2000, r
 
     return i1, i2
 
+def score_update(scores, vals, score_dict, filler = 0):
+    """Updates score dictionary prior to left_overlap functions.
+
+    Args:
+        scores (_type_): _description_
+        score_dict (_type_): _description_
+        filler (int, optional): _description_. Defaults to 0.
+
+    Returns:
+        _type_: _description_
+    """
+    for i in range(len(vals)):
+        score_dict[vals[i]] = scores[i]
+
+    return score_dict
+
+def post_tile_score_update(old_img, new_img, dictionary):
+    """Update score dictionary post-tiling.
+
+    Args:
+        old_img (_type_): _description_
+        new_img (_type_): _description_
+        dictionary (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    label_change = old_img - new_img
+    changed_mask = label_change != 0
+    old_labels = old_img[changed_mask]
+    new_labels = old_img[changed_mask]
+    for l in np.unique(new_labels):
+        l_mask = new_labels == l
+        replaced = np.unique(old_labels[l_mask])
+        s = []
+        s.append(dictionary)
+        for val in replaced:
+            s.append(dictionary[val])
+        max_index = s.index(max(s))
+        if max_index != 0:
+            dictionary[l] = max(s)
+        else:
+            pass
+        #for i in range(len(replaced)):
+        #    if i == 0:
+        #        pass
+        #    else:
+        #        dictionary.pop(replaced[i], None)
+
+    return dictionary
+
+def row_score_update(row_dict,overall_dict, row_filler):
+    """Update score dictionary for overall scores based on the separate row_dictionary produced
+    using the left_overlap phase.
+
+    Args:
+        row_dict (_type_): _description_
+        overall_dict (_type_): _description_
+        row_filler (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    keys = row_dict.keys()
+    for k in keys:
+        overall_dict[k+row_filler] = row_dict[k]
+
+    return overall_dict
+
 def tile_run(path,grid, orig_shape, img_side, over_n, score_thresh = 0):
     """Start the stitching process for the overall image from individual tiles post-inference.
 
@@ -134,13 +208,15 @@ def tile_run(path,grid, orig_shape, img_side, over_n, score_thresh = 0):
     Returns:
         _type_: _description_
     """
-    tiled_img = np.zeros(orig_shape)
+    tiled_img = np.zeros(orig_shape[:2])
     row_len = orig_shape[1]
-    tiled = load_imgs(path, img_side, grid, score_thresh)
+    #scores[0] is for label == 1 for future reference
+    overall_scores = {}
+    tiled, scores = load_imgs(path, img_side, grid, score_thresh)
     for j in range(grid[0]):
         
         tiled_row = np.zeros((img_side, orig_shape[1]))
-
+        row_scores = {}
         for i in range(grid[1]):
             
             current_tile_end = (i+1)*(img_side - over_n) + over_n
@@ -157,13 +233,17 @@ def tile_run(path,grid, orig_shape, img_side, over_n, score_thresh = 0):
 
             if i == 0:
                 tiled_row[0:img_side, corner_x:corner_x + img_side] += tiled[j*grid[1]]
+                row_scores = score_update(scores[j*grid[1]], np.unique(tiled[j*grid[1]])[1:],row_scores)
             else:
-                
                 #make sure no labels are the same across the two images
-                new_img = tiled[(grid[1]*j)+i] + np.unique(tiled_row)[-1]
-                new_img[new_img == np.unique(tiled_row)[-1]] = 0
+                filler_label = np.unique(tiled_row)[-1]
+                new_img = tiled[(grid[1]*j)+i] + filler_label
+                new_img[new_img == filler_label] = 0
+                row_scores = score_update(scores[(grid[1]*j)+i], np.unique(new_img)[1:], row_scores, filler=filler_label)
 
-                tiled_row, _ = left_overlap(tiled_row, new_img, 0, corner_x, over_n=over_n + excess ,img_side=img_side)
+                tiled_row, n_img = left_overlap(tiled_row, new_img, 0, corner_x, over_n=over_n + excess ,img_side=img_side)
+                #update score dictionary
+                row_scores = post_tile_score_update(new_img, n_img, row_scores)
         
         
         current_row_end = (j+1)*(img_side - over_n) + over_n
@@ -177,14 +257,29 @@ def tile_run(path,grid, orig_shape, img_side, over_n, score_thresh = 0):
 
         if j == 0:
             tiled_img[corner_y:corner_y+img_side, 0:row_len] += tiled_row
+            #just copy the existing dictionary
+            overall_scores = row_scores.copy()
         else:
-            tiled_row = tiled_row + np.unique(tiled_img)[-1]
-            tiled_row[tiled_row == np.unique(tiled_img)[-1]] = 0
-            tiled_img, _ = top_overlap_row(tiled_img, tiled_row, corner_y, 0, over_n=over_n+row_excess ,img_side = img_side, row_len=row_len)
+            row_filler_label = np.unique(tiled_img)[-1]
+            tiled_row = tiled_row + row_filler_label
+            tiled_row[tiled_row == row_filler_label] = 0
+            #add row score in to overall dict
+            overall_scores = row_score_update(row_scores, overall_scores, row_filler_label)
+            #do tiling
+            tiled_img, n_img = top_overlap_row(tiled_img, tiled_row, corner_y, 0, over_n=over_n+row_excess ,img_side = img_side, row_len=row_len)
+            #update score dictionary
+            overall_scores = post_tile_score_update(tiled_row, n_img, overall_scores)
 
     #optimizing label assignment
     n_unique = np.unique(tiled_img)
+    print(n_unique.size)
+    print(len(overall_scores.keys()))
+    final_scores = {}
     for i in range(n_unique.size):
-        tiled_img[tiled_img == n_unique[i]] = i  
+        tiled_img[tiled_img == n_unique[i]] = i
+        if i == 0:
+            pass
+        else:
+            final_scores[i] = overall_scores[n_unique[i]]
 
-    return tiled_img  
+    return tiled_img, final_scores
