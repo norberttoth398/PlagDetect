@@ -104,5 +104,5 @@ def __tile_only__(img_name, img_path,tile_path, out_path, img_side, overlap, thr
     ax.imshow(img)
     mask = tiled_img > 0
     ax.imshow(tiled_img, alpha = mask*0.5)
-    fig.savefig(out_path + name +  "labelled_img_" + str(thresh), dpi = 500)
+    fig.savefig(out_path + img_name +  "labelled_img_" + str(thresh), dpi = 500)
     return None
