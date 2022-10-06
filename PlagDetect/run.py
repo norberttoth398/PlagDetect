@@ -30,7 +30,7 @@ def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000,
     
     model = detector(config, checkpoint, device)
 
-    image  = cv2.imread(path + img)    
+    image  = cv2.imread(path + "/" +  img)    
 
     n,m = img_slice(image, path, img_size=img_side, overlap=over_n)
     import glob
@@ -41,10 +41,10 @@ def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000,
         img_ = imageName
         name = imageName.split("/")[len(imageName.split("/"))-1]
         result = inference_detector(model, img_)
-        if os.path.exists(path + "instance_res") == True:
+        if os.path.exists(path + "/instance_res") == True:
             pass
         else:
-            os.makedirs(path + "instance_res")
+            os.makedirs(path + "/instance_res")
 
         #perform mask NMS for the first time
         labs = torch.ones((len(result[0][0])))
@@ -58,37 +58,37 @@ def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000,
         nms_res = mask_nms(torch.Tensor(np.asarray(new_result[1][0])), labs, scores)
         new_result = nms_remove(new_result, nms_res, nms_crit)
 
-        model.show_result(img_, result, out_file=path + "instance_res/" +name + ".jpg")
+        model.show_result(img_, result, out_file=path + "/instance_res/" +name + ".jpg")
 
         label_img = tiling.create_label_image(new_result)
         
-        if os.path.exists(path + "labels") == True:
+        if os.path.exists(path + "/labels") == True:
             pass
         else:
-            os.makedirs(path + "labels")
-        np.savez(path + "labels/full_" + name, bb = new_result[0], mask = new_result[1])
+            os.makedirs(path + "/labels")
+        np.savez(path + "/labels/full_" + name, bb = new_result[0], mask = new_result[1])
 
     grid = (n,m)
     orig_shape = (image.shape[0], image.shape[1])
     img_side = img_side
     over_n = over_n
-    tile_run_path = path + "labels"
+    tile_run_path = path + "/labels"
 
 
     tiled_img, score_dict = tile_run(tile_run_path, grid, orig_shape, img_side, over_n)
 
-    np.save(path + "labels/res.npy", tiled_img)
-    np.savez(path + "labels/full_res.npy", img = tiled_img, scores = score_dict)
+    np.save(path + "/labels/res.npy", tiled_img)
+    np.savez(path + "/labels/full_res.npy", img = tiled_img, scores = score_dict)
 
     #combine real img and panoptic res:
     img  = plt.imread(path + img)
-    pan = np.load(path + "labels/res.npy")
+    pan = np.load(path + "/labels/res.npy")
     pan_mask = pan != 0
     pan_mask = pan_mask.astype("float")
     fig, ax = plt.subplots(1,1,figsize = (12,12))
     ax.imshow(img)
     ax.imshow(pan, alpha = pan_mask*0.5)
-    fig.savefig(path + "labels/labelled_img", dpi = 500)
+    fig.savefig(path + "/labels/labelled_img", dpi = 500)
 
 
 def __tile_only__(img_name, img_path,tile_path, out_path, img_side, overlap, thresh = 0):

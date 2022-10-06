@@ -30,11 +30,11 @@ def img_slice(img, dir, img_size = 2000, overlap = 100, slicing = True):
                 temp_slice = img[x_start:x_start+img_size,
                                 y_start:y_start +img_size,
                                 :]
-                if os.path.exists(dir + "imgs") == True:
+                if os.path.exists(dir + "/imgs") == True:
                     pass
                 else:
-                    os.makedirs(dir + "imgs")
-                cv2.imwrite( dir + "imgs/image_" + str(i) + "_" + str(j) + ".jpg", temp_slice, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+                    os.makedirs(dir + "/imgs")
+                cv2.imwrite( dir + "/imgs/image_" + str(i) + "_" + str(j) + ".jpg", temp_slice, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
     else:
         pass
     return n,m
