@@ -10,9 +10,14 @@ from PIL import Image
 Image.MAX_IMAGE_PIXELS = 100000000000
 
 #own functions
+import detector
+import nms
+import tiling
+import slicing
+import thresholding
 from .slicing import img_slice
 from .tiling import tile_run
-from .nms import mask_nms, matrix_nms
+from .nms import mask_nms, matrix_nms, nms_remove
 from .detector import detector
 from .thresholding import threshold_labs, build_img
 
@@ -60,7 +65,7 @@ def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000,
 
         model.show_result(img_, result, out_file=path + "/instance_res/" +name + ".jpg")
 
-        label_img = tiling.create_label_image(new_result)
+        label_img = tiling.create_label_image(new_result, img_side)
         
         if os.path.exists(path + "/labels") == True:
             pass
