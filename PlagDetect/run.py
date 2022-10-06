@@ -86,7 +86,7 @@ def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000,
     np.savez(path + "/labels/full_res.npy", img = tiled_img, scores = score_dict)
 
     #combine real img and panoptic res:
-    img  = plt.imread(path + img)
+    img  = plt.imread(path + "/" + img)
     pan = np.load(path + "/labels/res.npy")
     pan_mask = pan != 0
     pan_mask = pan_mask.astype("float")
