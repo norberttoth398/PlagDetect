@@ -94,6 +94,7 @@ def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000,
     ax.imshow(img)
     ax.imshow(pan, alpha = pan_mask*0.5)
     fig.savefig(path + "/labels/labelled_img", dpi = 500)
+    return None
 
 
 def __tile_only__(img_name, img_path,tile_path, out_path, img_side, overlap, thresh = 0):
