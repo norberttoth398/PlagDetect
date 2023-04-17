@@ -1,6 +1,8 @@
 addict==2.4.0
 backcall==0.2.0
 backports.functools-lru-cache==1.6.4
+bilby==2.0.2
+bilby-cython==0.4.0
 certifi==2021.10.8
 charset-normalizer==2.0.12
 click==7.1.2
@@ -11,6 +13,7 @@ dataclasses==0.6
 debugpy==1.5.1
 decorator==5.1.1
 entrypoints==0.4
+emcee==3.1.4
 fonttools==4.37.1
 future==0.18.2
 idna==3.3
