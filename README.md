@@ -27,3 +27,8 @@ Install using the following command:
 
 	pip install git+ssh://git@github.com/norberttoth398/PlagDetect#egg=PlagDetect
 
+
+#### Cite
+Publication for the above repository is formally in the preparation stage. This work is presented at the EGU 2023 conference however, until formal publication of a manuscript please cite:
+
+N Toth, J Maclennan (2023) "A Deep Learning Enabled Approach for Igneous Textural Timescales", EGU 2023, DOI: 10.5194/egusphere-egu23-9289 
