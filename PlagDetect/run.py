@@ -17,22 +17,30 @@ import slicing
 import thresholding
 from .slicing import img_slice
 from .tiling import tile_run
-from .nms import mask_nms, matrix_nms, nms_remove
+from .nms import mask_nms, nms_remove
 from .detector import detector
 from .thresholding import threshold_labs, build_img
 
-def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000, img_side = 2000, over_n = 100, nms_crit = 0.5):
+def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000, img_side = 2000, over_n = 100, nms_crit = 0.5, thresh = 0):
+
     """Run entire script with.
 
     Args:
         weights (str): path to pretrained weights
-        img (str): path to image to perform inference
-        path (str): path to save everythin on; need to contain instance_res and panoptic_res subdirectories
+        img (str): name of image to perform inference
+        path (str): path containing img and to save everything on; need to contain 
         min_size_test (int, optional): Shortest side of individual tile to be resized to, recommend original divided by 2 if resolution is same as training set. Defaults to 1000.
         img_side (int, optional): Length of the side of individual tiles. Defaults to 2000.
         over_n (int, optional): Overlap between tiles. Defaults to 100.
+        thresh (int, optional): Threshold score during tiling; nominally a value between 0 and 1. Defaults to 0.
     """
-    
+    if thresh > 1:
+        thresh = 1
+    elif thresh < 0:
+        thresh = 0
+    else:
+        pass
+
     model = detector(config, checkpoint, device)
 
     image  = cv2.imread(path + "/" +  img)    
@@ -80,7 +88,7 @@ def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000,
     tile_run_path = path + "/labels"
 
 
-    tiled_img, score_dict = tile_run(tile_run_path, grid, orig_shape, img_side, over_n)
+    tiled_img, score_dict = tile_run(tile_run_path, grid, orig_shape, img_side, over_n, thresh = thresh)
 
     np.save(path + "/labels/res.npy", tiled_img)
     np.savez(path + "/labels/full_res.npy", img = tiled_img, scores = score_dict)
@@ -98,6 +106,20 @@ def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000,
 
 
 def __tile_only__(img_name, img_path,tile_path, out_path, img_side, overlap, thresh = 0):
+    """ Function to perform tiling only
+
+    Args:
+        img_name (str): name of image
+        img_path (str): path to image to perform inference on
+        tile_path (str): path that includes the tiles
+        out_path (str): path to save everything
+        img_side (int): Size of tiles - square assumed
+        overlap (int): Overlap between tiles
+        thresh (int, optional): Threshold score during tiling; nominally a value between 0 and 1. Defaults to 0.
+
+    Returns:
+        None
+    """
     img = plt.imread(img_path + img_name + ".jpg")
     orig_shape = img.shape
     n, m = img_slice(img, img_path, img_size=img_side, overlap=overlap, slicing = False)
@@ -112,3 +134,4 @@ def __tile_only__(img_name, img_path,tile_path, out_path, img_side, overlap, thr
     ax.imshow(tiled_img, alpha = mask*0.5)
     fig.savefig(out_path + img_name +  "labelled_img_" + str(thresh) + ".png", dpi = 500)
     return None
+

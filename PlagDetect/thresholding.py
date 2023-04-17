@@ -11,9 +11,9 @@ def threshold_labs(pred, thresh = 0, save = False):
     """Quick and easy function to filter out results based on the saved detection scores for each proposed object.
 
     Args:
-        original_img (_type_): _description_
-        pred_img (_type_): _description_
-        thresh (int, optional): _description_. Defaults to 0.
+        pred (ndarray): name of the segmentation output data - assumed to be output of this software
+        thresh (int, optional): Threshold for filtering low scores; between 0 and 1. Defaults to 0.
+        save (bool, optional): Set to True if image is to be saved. Defaults to False.
 
     Returns:
         _type_: _description_
@@ -29,7 +29,7 @@ def threshold_labs(pred, thresh = 0, save = False):
         img[img == item] = 0
 
     if save == True:
-        plt.imsave("pred_img.pngy", img, dpi = 300)
+        plt.imsave("pred_img.png", img, dpi = 300)
     else:
         pass
     
@@ -39,9 +39,9 @@ def build_img(orig_img, pred, thresh = 0):
     """Function to plot image with its predicted labels as a translucent mask on top.
 
     Args:
-        orig_img (_type_): _description_
-        pred (_type_): _description_
-        thresh (int, optional): _description_. Defaults to 0.
+        orig_img (ndarrau): Image used for inference.
+        pred (ndarray): Predicted label image.
+        thresh (int, optional): Threshold for filtering low scores; between 0 and 1. Defaults to 0.
 
     Returns:
         _type_: _description_

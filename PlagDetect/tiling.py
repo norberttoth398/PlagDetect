@@ -10,6 +10,17 @@ from PIL import Image
 Image.MAX_IMAGE_PIXELS = 100000000000
 
 def create_label_image(result,img_side, score_thresh = 0):
+    """Creates label image from list of results
+
+    Args:
+        result (list/ndarray): direct result of inference by model
+        img_side (int): size of square image.
+        score_thresh (int, optional): Threshold for filtering low scores; between 0 and 1. Defaults to 0.
+
+    Returns:
+        label_img: image showing position of segmented crystals
+        used_scores: list of scores used in label_img
+    """
     #create label image from result list (pre or post NMS)
     label_img = np.zeros((img_side,img_side))
     used_scores = []
@@ -29,7 +40,9 @@ def create_label_image(result,img_side, score_thresh = 0):
     return label_img, used_scores
 
 def load_imgs(path, img_side ,grid = (6,5), score_thresh = 0):
-    #define relations between each tile for loading and post-processing
+    """define relations between each tile for loading and post-processing
+    """
+    
 
     n_tiles = grid[0]*grid[1]
     tile_list = []
@@ -46,6 +59,8 @@ def load_imgs(path, img_side ,grid = (6,5), score_thresh = 0):
 
 
 def replace_vals(img1, img2, overlapped, corner_x, corner_y):
+    """ Performs the stitching procedure where images are overlapping.
+    """
     coords = np.where(overlapped == 2)
     used_vals = []
 
@@ -70,6 +85,8 @@ def replace_vals(img1, img2, overlapped, corner_x, corner_y):
 
 
 def left_overlap(i1, i2, corner_y, corner_x, over_n = 100, img_side = 2000):
+    """ Wrapper for stitching function when building row of tile images.
+    """
     o1 = i1[corner_y:corner_y+img_side, corner_x:corner_x+over_n] #tile image
     o2 = i2[:,:over_n]
 
@@ -86,6 +103,8 @@ def left_overlap(i1, i2, corner_y, corner_x, over_n = 100, img_side = 2000):
     return i1, i2
 
 def top_overlap(i1, i2, corner_y, corner_x, over_n = 100, img_side = 2000, row_len = 9600):
+    """ Wrapper for stitching function when building columns (may be deprecated)
+    """
     o1 = i1[corner_y:corner_y+over_n, corner_x:corner_x+img_side] #tile image
     o2 = i2[:over_n,:]
 
@@ -102,23 +121,15 @@ def top_overlap(i1, i2, corner_y, corner_x, over_n = 100, img_side = 2000, row_l
     return i1, i2
 
 def top_overlap_row(i1, i2, corner_y, corner_x, over_n = 100, img_side = 2000, row_len = 9600):
+    """ Wrapper for stitching function when building full image from rows.
+    """
     o1 = i1[corner_y:corner_y+over_n, corner_x:corner_x+row_len] #tile image
     o2 = i2[:over_n,:]
 
     mask1 = o1 != 0
     mask2 = o2 != 0
     overlapped = mask1.astype("int") + mask2.astype("int")
-    #print(np.sum(o1[overlapped==2] - o2[overlapped==2]))
-
     i1, i2 = replace_vals(i1,i2,overlapped, corner_x, corner_y)
-
-    #o1 = i1[corner_y:corner_y+over_n, corner_x:corner_x+row_len] #tile image
-    #o2 = i2[:100,:]
-
-    #mask1 = o1 != 0
-    #mask2 = o2 != 0
-    #new_overlapped = mask1.astype("int") + mask2.astype("int")
-    #print(np.sum(o1[new_overlapped==2] - o2[new_overlapped==2]))
  
     overlapped[overlapped == 0] = 1
     i1[corner_y:corner_y + img_side, corner_x:corner_x+row_len] += i2
@@ -128,14 +139,6 @@ def top_overlap_row(i1, i2, corner_y, corner_x, over_n = 100, img_side = 2000, r
 
 def score_update(scores, vals, score_dict, filler = 0):
     """Updates score dictionary prior to left_overlap functions.
-
-    Args:
-        scores (_type_): _description_
-        score_dict (_type_): _description_
-        filler (int, optional): _description_. Defaults to 0.
-
-    Returns:
-        _type_: _description_
     """
     for i in range(len(vals)):
         score_dict[vals[i]] = scores[i]
@@ -144,14 +147,6 @@ def score_update(scores, vals, score_dict, filler = 0):
 
 def post_tile_score_update(old_img, new_img, dictionary):
     """Update score dictionary post-tiling.
-
-    Args:
-        old_img (_type_): _description_
-        new_img (_type_): _description_
-        dictionary (_type_): _description_
-
-    Returns:
-        _type_: _description_
     """
     label_change = old_img - new_img
     changed_mask = label_change != 0
@@ -169,25 +164,12 @@ def post_tile_score_update(old_img, new_img, dictionary):
             dictionary[l] = max(s)
         else:
             pass
-        #for i in range(len(replaced)):
-        #    if i == 0:
-        #        pass
-        #    else:
-        #        dictionary.pop(replaced[i], None)
 
     return dictionary
 
 def row_score_update(row_dict,overall_dict, row_filler):
     """Update score dictionary for overall scores based on the separate row_dictionary produced
     using the left_overlap phase.
-
-    Args:
-        row_dict (_type_): _description_
-        overall_dict (_type_): _description_
-        row_filler (_type_): _description_
-
-    Returns:
-        _type_: _description_
     """
     keys = row_dict.keys()
     for k in keys:
@@ -196,17 +178,18 @@ def row_score_update(row_dict,overall_dict, row_filler):
     return overall_dict
 
 def tile_run(path,grid, orig_shape, img_side, over_n, score_thresh = 0):
-    """Start the stitching process for the overall image from individual tiles post-inference.
+    """Main wrapper function to start the tile stitching process for the overall image from individual tiles post-inference.
 
     Args:
-        path (_type_): _description_
-        grid (_type_): _description_
-        orig_shape (_type_): _description_
-        img_side (_type_): _description_
-        over_n (_type_): _description_
+        path (str): path with all the data in it - should be same as that used previously for inference.
+        grid ((int, int)): (n,m) values from function that sliced images
+        orig_shape ((int, int)): Original shape of the image inference was performed on.
+        img_side (int): Size of square tile image used - length of side.
+        over_n (int): Overlap between tiles in pixels
 
     Returns:
-        _type_: _description_
+        tiled_img (ndarray): Final tiled image showing all the labels.
+        final_scores (dict): Final dictionary of all the detection scores.
     """
     tiled_img = np.zeros(orig_shape[:2])
     row_len = orig_shape[1]

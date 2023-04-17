@@ -5,7 +5,18 @@ from PIL import Image
 Image.MAX_IMAGE_PIXELS = 100000000000
 
 
-def detector(file = 'models/mmdet_detectoRS_dataAug.py', checkpoint = 'models/27May_r50_detectoRS_extraAug.pth', device = "cpu"):
+def detector(file , checkpoint, device = "cpu"):
+
+    """Create detector object - a realisation of the model supplied to the function via the relevant config and checkpoint files.
+
+    Args:
+        file (str): Location of config file.
+        checkpoint (str): Location of checkpoint file.
+        device (str, optional): Device to use for inference - CPU or GPU. Defaults to "cpu".
+
+    Returns:
+        model: MMDetect model object generated.
+    """
 
     # Specify the path to model config and checkpoint file
     config_file = file
