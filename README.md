@@ -20,7 +20,7 @@ Install required libraries:
 
 	pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu110/torch1.7.0/index.html
 
-	mim install mmdet
+	mim install "mmdet<3.0.0"
 
 #### Install PlagDetect
 Install using the following command: 
