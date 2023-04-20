@@ -1,5 +1,29 @@
-site_name: My Docs
+site_name: PlagDetect
 
 theme:
     name: readthedocs
     highlightjs: true
+
+plugins:
+  - search
+  - mkdocstrings
+  - mkdocs-jupyter
+
+nav:
+  - PlagDetect: index.md
+  - Training: Training.md
+  - Inference: Inference.md
+  - Examples:
+    - Skuggafjoll: examples/Skuggafjoll_analysis.ipynb
+    - Sill Calibration: examples/Sill_calibration.ipynb
+  - References:
+    - Detector: references/detector.md
+    - NMS: references/NMS.md
+    - Tiling: references/tiling.md
+    - Slicing: references/slicing.md
+    - Thresholding: references/thresholding.md
+    - Run: references/run.md
+    - Process:
+       - Measure: references/measure.md
+       - Texture: references/texture.md
+       - ShapeCalc: references/shape_calc.md
