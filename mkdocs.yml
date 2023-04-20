@@ -11,9 +11,13 @@ plugins:
 
 nav:
   - PlagDetect: index.md
+  - About PlagDetect:
+    - How to cite: cite.md
+    - How to contribute: contribute.md
+  - Background: background.md
   - Training: Training.md
   - Inference: Inference.md
-  - Textural Work
+  - Textural Work: textural_work.md
   - Examples:
     - Skuggafjoll: examples/Skuggafjoll_analysis.ipynb
     - Sill Calibration: examples/Sill_calibration.ipynb
@@ -28,3 +32,4 @@ nav:
        - Measure: references/measure.md
        - Texture: references/texture.md
        - ShapeCalc: references/shape_calc.md
+  - Licence: licence.md
