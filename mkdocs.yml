@@ -13,6 +13,7 @@ nav:
   - PlagDetect: index.md
   - Training: Training.md
   - Inference: Inference.md
+  - Textural Work
   - Examples:
     - Skuggafjoll: examples/Skuggafjoll_analysis.ipynb
     - Sill Calibration: examples/Sill_calibration.ipynb
