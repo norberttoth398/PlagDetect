@@ -1,5 +1,7 @@
 site_name: PlagDetect
 
+copyright: Copyright (c) 2023 Norbert Toth
+
 theme:
     name: readthedocs
     highlightjs: true
