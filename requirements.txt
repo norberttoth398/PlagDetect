@@ -1,7 +1,7 @@
 addict==2.4.0
 backcall==0.2.0
 backports.functools-lru-cache==1.6.4
-bilby==2.0.2
+bilby<=2.0.2
 bilby-cython==0.4.0
 certifi==2021.10.8
 charset-normalizer==2.0.12
