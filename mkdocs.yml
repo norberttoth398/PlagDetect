@@ -34,4 +34,5 @@ nav:
        - Measure: references/measure.md
        - Texture: references/texture.md
        - ShapeCalc: references/shape_calc.md
+       - MCMC Prediction: references/mcmc.md
   - Licence: licence.md
