@@ -1,6 +1,7 @@
 # PlagDetect
 
-[![Documentation Status](https://readthedocs.org/projects/plagdetect/badge/?version=latest)](https://plagdetect.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/plagdetect/badge/?version=latest)](https://plagdetect.readthedocs.io/en/latest/?badge=latest) 
+
 
 Repository for Deep Learning based petrography of igneous Plagioclase crystals based on circular polarised light images of thin sections. We make extensive use of the MMDetection library, with the work based on DetectoRS models.
 
