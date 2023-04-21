@@ -36,4 +36,4 @@ Install using the following command:
 #### Cite
 Publication for the above repository is formally in the preparation stage. This work is presented at the EGU 2023 conference however, until formal publication of a manuscript please cite:
 
-	N Toth, J Maclennan (2023) "A Deep Learning Enabled Approach for Igneous Textural Timescales", EGU 2023, DOI: 10.5194/egusphere-egu23-9289 
+	norberttoth398. (2023). norberttoth398/PlagDetect: First release - for peer review (v0.1.0). Zenodo. https://doi.org/10.5281/zenodo.7851939 
