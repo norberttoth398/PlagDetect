@@ -14,13 +14,15 @@ plugins:
 nav:
   - PlagDetect: index.md
   - About PlagDetect:
+    - Background: background.md
+    - Training: Training.md
+    - Inference: Inference.md
+    - Textural Work: textural_work.md
     - How to cite: cite.md
     - How to contribute: contribute.md
-  - Background: background.md
-  - Training: Training.md
-  - Inference: Inference.md
-  - Textural Work: textural_work.md
   - Examples:
+    - Training Example: examples/mmdetect-maskrcnn.ipynb
+    - Example Inference: examples/example_inference.md
     - Skuggafjoll: examples/Skuggafjoll_analysis.ipynb
     - Sill Calibration: examples/Sill_calibration.ipynb
   - References:
