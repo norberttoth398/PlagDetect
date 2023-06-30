@@ -30,7 +30,7 @@ Install required libraries:
 #### Install PlagDetect
 Install using the following command: 
 
-	pip install git+ssh://git@github.com/norberttoth398/PlagDetect#egg=PlagDetect
+	pip install git+https://git@github.com/norberttoth398/PlagDetect
 
 
 #### Cite
