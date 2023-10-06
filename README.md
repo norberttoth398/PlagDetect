@@ -11,6 +11,8 @@ Repository for Deep Learning based petrography of igneous Plagioclase crystals b
 
 In order to install this private package you must be able to access it (which you can if you're reading this) and run have/create a python 3.7 environment for relevant package requirements (PyTorch can be a pain like that). 
 
+Ensure GCC is installed on your system.
+
 #### Step 1
 Activate environment: 
 	
@@ -21,6 +23,8 @@ Install required libraries:
 
 	pip install torch==1.7.0+cu110 torchvision==0.8.0 torchaudio==0.7.0 -f https://download.pytorch.org/whl/torch_stable.html
 	
+	OR pip install torch==1.7.0 torchvision==0.8.0 torchaudio==0.7.0 (mac users)
+
 	pip install openmim
 
 	pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu110/torch1.7.0/index.html
