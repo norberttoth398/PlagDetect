@@ -10,11 +10,11 @@ from PIL import Image
 Image.MAX_IMAGE_PIXELS = 100000000000
 
 #own functions
-import detector
-import nms
-import tiling
-import slicing
-import thresholding
+#import detector
+#import nms
+#import tiling
+#import slicing
+#import thresholding
 from .slicing import img_slice
 from .tiling import tile_run
 from .nms import mask_nms, nms_remove
