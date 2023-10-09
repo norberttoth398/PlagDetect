@@ -44,6 +44,8 @@ Install required libraries (non-cluster):
 
 	pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu110/torch1.7.0/index.html
 
+	OR pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cpu/torch1.7.0/index.html (mac users)
+
 	mim install "mmdet<3.0.0"
 
 #### Install PlagDetect
