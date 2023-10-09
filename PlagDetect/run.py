@@ -127,7 +127,7 @@ def __tile_only__(img_name, img_path,tile_path, out_path, img_side, overlap, thr
 
     tiled_img, score_dict = tile_run(tile_path, grid, orig_shape, img_side, overlap,score_thresh = thresh)
 
-    np.savez(img_name + "_res.npy", img = tiled_img, scores = score_dict)
+    np.savez(out_path + img_name + "_res.npy", img = tiled_img, scores = score_dict)
     fig, ax = plt.subplots(1,1,figsize = (12,12))
     ax.imshow(img)
     mask = tiled_img > 0
