@@ -19,7 +19,22 @@ Activate environment:
 	eg conda activate PlagDetectEnv
 
 #### Step 2
-Install required libraries:
+Install required libraries (cluster nodes):
+
+        wget https://download.pytorch.org/whl/cu110/torch-1.7.0%2Bcu110-cp37-cp37m-linux_x86_64.whl
+
+	pip install torch-1.7.0+cu110-cp37-cp37m-linux_x86_64.whl
+
+	pip install torchvision==0.8.0 torchaudio==0.7.0
+
+        pip install openmim
+
+        pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu110/torch1.7.0/index.html
+
+        mim install "mmdet<3.0.0"
+
+
+Install required libraries (non-cluster):
 
 	pip install torch==1.7.0+cu110 torchvision==0.8.0 torchaudio==0.7.0 -f https://download.pytorch.org/whl/torch_stable.html
 	
