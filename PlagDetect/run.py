@@ -21,6 +21,21 @@ from .nms import mask_nms, nms_remove
 from .detector import detector
 from .thresholding import threshold_labs, build_img
 
+def pad_img(img, img_side):
+    a1 = img_side - img.shape[0]
+    a2 = img_side - img.shape[0]
+
+    if a1 < 0:
+        a1 = 0
+    if a2 < 0:
+        a2 = 0
+
+    image = np.zeros((img.shape[0]+a1, img.shape[1] + a2, 3), dtype = "uint8")
+
+    image[:img.shape[0], img.shape[1]] += img
+        
+    return image
+
 def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000, img_side = 2000, over_n = 100, nms_crit = 0.5, thresh = 0):
 
     """Run entire script with.
@@ -43,7 +58,14 @@ def __run__(img, path, config, checkpoint, device = "cpu", min_size_test = 1000,
 
     model = detector(config, checkpoint, device)
 
-    image  = cv2.imread(path + "/" +  img)    
+    image  = cv2.imread(path + "/" +  img)
+
+    if image.shape[0] < img_side:
+        image = pad_img(image, img_side)
+    elif image.shape[1] < img_side:
+        image = pad_img(image, img_side)
+    else:
+        pass
 
     n,m = img_slice(image, path, img_size=img_side, overlap=over_n)
     import glob
